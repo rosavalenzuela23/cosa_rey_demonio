@@ -1,0 +1,3 @@
+[submodule "talkies"]
+    path = libraries/talkies
+    url = https://github.com/tanema/talkies.git
