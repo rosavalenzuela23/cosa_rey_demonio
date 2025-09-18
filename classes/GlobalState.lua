@@ -1,36 +1,51 @@
-local json = require('libraries.dkjson.dkjson')
-local stateFile = require("dialogs.state")
-local dialogFile = require("dialogs.start")
+local JSON = require('libraries.dkjson.dkjson')
+local StateFile = require("classes.State")
+local DialogFile = require("dialogs.start")
 
 local GlobalState = {}
 GlobalState.__index = GlobalState
 
 local instance = nil
+local fileName = "current_state.txt"
+
+--- func desc
+---@param filename string
+local function loadJsonState(filename)
+    local saveFile = io.open(filename, "r")
+
+    if not saveFile then
+        return nil
+    end
+
+    local stateFile = JSON.decode(saveFile:read("*a"))
+    
+    saveFile:close()
+    return stateFile
+end
 
 GlobalState.getInstance = function()
-    if instance == nil then
 
-        local saveFile = io.open("current_state.txt", "r")
-        if saveFile ~= nil then
-            stateFile = json.decode(saveFile:read("*a"))
-            saveFile:close()
+    if not instance then
+        local jsonTable = loadJsonState(fileName)
+        local state = StateFile
+
+        if jsonTable then
+            state = jsonTable
         end
 
         instance = setmetatable({
-            state = stateFile,
-            dialog = dialogFile
+            state = state,
+            dialog = DialogFile
         }, GlobalState)
-        
     end
 
     return instance
 end
 
 function GlobalState:saveSate()
-    local saveFile = io.open("current_state.txt", "w")
-    saveFile:write(
-        json.encode(self.state, { indent = true })
-    )
+    local saveFile = io.open(fileName, "w")
+    local string = JSON.encode(self.state, { indent = true })
+    saveFile:write(string)
     saveFile:close()
 end
 
