@@ -9,7 +9,7 @@ local _, _, w, h = love.window.getSafeArea()
 ---@param sprite string
 ---@param title string
 ---@param description string
-ItemViewer.new = function (sprite, title, description)
+ItemViewer.new = function(sprite, title, description)
     local imageObject = love.graphics.newImage(sprite)
 
     return setmetatable({
@@ -17,10 +17,32 @@ ItemViewer.new = function (sprite, title, description)
         image = imageObject,
         title = title,
         description = description,
-        x = (w/2) - (imageObject:getWidth()/2),
+        backgroundColor = { 1, 1, 1, 1 },
+        textColor = { 1, 1, 1, 1 },
+        x = (w / 2) - (imageObject:getWidth() / 2),
         y = h * 0.05,
     }, ItemViewer)
 
+end
+
+--- func desc
+---@param color {r: number, g: number, b: number, a: number}
+---@return ItemViewer self
+function ItemViewer:setTextColor(color)
+    assert(type(color) == "table", "Color must be a table")
+
+    self.textColor = color
+    return self
+end
+
+--- func desc
+---@param color {r: number, g: number, b: number, a: number}
+---@return ItemViewer self
+function ItemViewer:setBackgroundColor(color)
+    assert(type(color) == "table", "Color must be a table")
+
+    self.backgroundColor = color
+    return self
 end
 
 function ItemViewer:notify(event, ...)
@@ -30,13 +52,11 @@ function ItemViewer:notify(event, ...)
 end
 
 function ItemViewer:keypressed(key, scancode, isrepeat)
-    if key == "escape" then
-        self:hide()
-    end
+    return
 end
 
 function ItemViewer:hide()
-    print("I'm hidding!")
+    return
 end
 
 function ItemViewer:show()
@@ -47,17 +67,34 @@ end
 function ItemViewer:draw()
     love.graphics.draw(self.image, self.x, self.y, 0)
 
-    if self.title == nil then
+    if not self.title then
         return
     end
 
     -- Donde termina la imagen y le sumamos un 5% del tamaño de la pantalla
     -- Para poder mostrar el texto
     local text_y = self.y + self.image:getHeight() + h * 0.05
+    local pixelOffset = 10 -- px
+    local innerPadding = 10 -- px
 
-    love.graphics.print(self.title, self.x + 10, text_y)
-    love.graphics.print(self.description, self.x + 10, text_y + 20)
+    local r, g, b, a = love.graphics.getColor()
 
+    -- Dibujar un cuadrado como fondo para el texto
+    love.graphics.setColor(self.backgroundColor)
+    love.graphics.rectangle(
+        "fill",
+        self.x - innerPadding,
+        text_y - innerPadding,
+        self.image:getWidth() + innerPadding * 2,
+        h - text_y
+    )
+
+    love.graphics.setColor(self.textColor)
+    -- Dibujar el texto
+    love.graphics.print(self.title, self.x + pixelOffset, text_y)
+    love.graphics.print(self.description, self.x + pixelOffset, text_y + pixelOffset * 2)
+
+    love.graphics.setColor({ r, g, b, a })
 end
 
 return ItemViewer

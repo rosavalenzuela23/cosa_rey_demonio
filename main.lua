@@ -5,14 +5,17 @@ local talkies = require("libraries.talkies.talkies")
 local GlobalState = require('classes.GlobalState')
 local EventDispatcher = require('classes.EventDispatcher')
 local ImageViewer = require('classes.ItemViewer')
+local UIRender = require('classes.UIRender')
 
 local draw_queue = {}
 
 function love.load()
-    GlobalState.getInstance()
+    local globalState = GlobalState.getInstance()
     local pistol = ImageViewer.new("sprites/prueba.png", "Pistol", "A handgun");
-    pistol:show()
+
     table.insert(draw_queue, pistol)
+
+    globalState:saveSate()
 end
 
 function love.update(dt)
@@ -20,12 +23,8 @@ function love.update(dt)
 end
 
 function love.draw()
+    UIRender.getInstance():draw()
     talkies.draw()
-
-    for _, item in ipairs(draw_queue) do
-        item:draw()
-    end
-
 end
 
 function love.keypressed(key, scancode, isrepeat)
