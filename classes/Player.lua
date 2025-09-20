@@ -8,19 +8,25 @@ local instance = nil
 local worldInstance = World.getInstance()
 
 local PlayerState = {
-    STANDING = 0,
-    WALKING = 1,
+    STANDING = "standing",
+    WALKING = "walking",
+    RUNNING = "running"
 }
 
 Player.getInstance = function()
     local globalState = GlobalState.getInstance()
 
     if not instance then
-        local bodyCollider = worldInstance:createRectangleCollider(0, 0, 100, 100)
+        local playerSize = {
+            width = 32,
+            height = 64
+        }
+        local bodyCollider = worldInstance:createRectangleCollider(0, 0, playerSize.width, playerSize.height)
         bodyCollider:setFixedRotation(true)
 
         instance = setmetatable({
             body = bodyCollider,
+            size = playerSize,
             controls = {
                 up = globalState.state.config.keyboard.up,
                 down = globalState.state.config.keyboard.down,
@@ -29,17 +35,33 @@ Player.getInstance = function()
                 run = globalState.state.config.keyboard.run
             },
             sprites = {
-                standing = 'sprites/player_sprites/standing.png',
-                walk_1 = 'sprites/player_sprites/walk_1.png',
-                walk_2 = 'sprites/player_sprites/walk_2.png'
+                actual_sprite = nil,
             },
             animations = {
                 walking = {
-                    speed = 400, --ms
+                    speed = 0.4, --ms
                     order = {
                         love.graphics.newImage('sprites/player_sprites/walk_1.png'),
                         love.graphics.newImage('sprites/player_sprites/walk_2.png')
-                    }
+                    },
+                    currentFrame = 1,
+                    currentTime = 0
+                },
+                running = {
+                    speed = 0.2, --ms
+                    order = {
+                        love.graphics.newImage('sprites/player_sprites/walk_1.png'),
+                        love.graphics.newImage('sprites/player_sprites/walk_2.png')
+                    },
+                    currentFrame = 1,
+                    currentTime = 0
+                },
+                standing = {
+                    order = {
+                        love.graphics.newImage('sprites/player_sprites/standing.png')
+                    },
+                    currentFrame = 1,
+                    currentTime = 0
                 }
             },
             state = PlayerState.STANDING,
@@ -51,8 +73,28 @@ Player.getInstance = function()
     return instance
 end
 
+function Player:updateAnimation(dt)
+
+    if self.animations[self.state].speed == nil then
+        return
+    end
+
+    self.animations[self.state].currentTime = self.animations[self.state].currentTime + dt
+
+    if (self.animations[self.state].currentTime >= self.animations[self.state].speed) then
+        self.animations[self.state].currentTime = 0
+        self.animations[self.state].currentFrame = self.animations[self.state].currentFrame + 1
+
+        if (self.animations[self.state].currentFrame > #self.animations[self.state].order) then
+            self.animations[self.state].currentFrame = 1
+        end
+
+    end
+end
+
 function Player:update(dt)
     self:move(dt)
+    self:updateAnimation(dt)
 end
 
 --- func desc
@@ -80,6 +122,7 @@ function Player:move(dt)
     local vector_x = 0
     local vector_y = 0
     local finalSpeed = self.movementSpeed
+    self.state = PlayerState.STANDING
 
     if love.keyboard.isDown(self.controls.right) then
         vector_x = vector_x + 1
@@ -98,20 +141,26 @@ function Player:move(dt)
         finalSpeed = self.runningSpeed
     end
 
+    if (vector_x ~= 0 or vector_y ~= 0) then
+        self.state = PlayerState.WALKING
+        if love.keyboard.isDown(self.controls.run) then
+            self.state = PlayerState.RUNNING
+        end
+    end
+
     local finalVector = normalizeVector2D({ x = vector_x, y = vector_y })
 
     self.body:setLinearVelocity(finalVector.x * finalSpeed, finalVector.y * finalSpeed)
-
-    if (vector_x == 0 and vector_y == 0) then
-        self.state = PlayerState.STANDING
-    else
-        self.state = PlayerState.WALKING
-    end
 end
 
 function Player:draw()
     local x, y = self.body:getPosition()
-    love.graphics.rectangle("fill", x - 50, y - 50, 100, 100)
+    local image = self.animations[self.state].order[self.animations[self.state].currentFrame]
+    local playerWidth = self.size.width
+    local playerHeight = self.size.height
+    love.graphics.draw(image, x, y, nil, nil, nil, playerWidth / 2, playerHeight / 2)
 end
+
+
 
 return Player
