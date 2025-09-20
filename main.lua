@@ -1,37 +1,32 @@
 -- libraries
-local talkies = require("libraries.talkies.talkies")
 
 -- classes
-local GlobalState = require('classes.GlobalState')
-local EventDispatcher = require('classes.EventDispatcher')
-local ImageViewer = require('classes.ItemViewer')
-local UIRender = require('classes.UIRender')
-
-local draw_queue = {}
+local World = require 'classes.World'
+local Player = require 'classes.Player'
 
 function love.load()
-    local globalState = GlobalState.getInstance()
-    local pistol = ImageViewer.new("sprites/prueba.png", "Pistol", "A handgun");
+    local world = World.getInstance()
 
-    table.insert(draw_queue, pistol)
+    local rectangle = world:createRectangleCollider(400 - 50/2, 0, 50, 50)
+    rectangle:setType("static")
 
-    globalState:saveSate()
 end
 
 function love.update(dt)
-    talkies.update(dt)
+    Player.getInstance():update(dt)
+    World.getInstance():update(dt)
 end
 
 function love.draw()
-    UIRender.getInstance():draw()
-    talkies.draw()
+    World.getInstance():draw()
+    Player.getInstance():draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    local eventDispatcher = EventDispatcher.getInstance()
-    eventDispatcher:dispatchEvent("keypressed", key, scancode, isrepeat)
 end
 
 function love.keyreleased(key)
-
+    if key == "escape" then
+        love.event.quit()
+    end
 end
