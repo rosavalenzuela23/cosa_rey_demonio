@@ -1,3 +1,10 @@
+# For dialog in love
 [submodule "talkies"]
     path = libraries/talkies
     url = https://github.com/tanema/talkies.git
+
+# For 3D in love
+[submodule "Menori"]
+    path = libraries/Menori
+    url = https://github.com/rozenmad/Menori.git
+    
