@@ -2,15 +2,10 @@ local WF = require 'libraries.windfield.windfield'
 local World = {}
 World.__index = World
 
-local instance = nil
-
-function World.getInstance()
-    if not instance then
-        instance = setmetatable({
-            wfWorld = WF.newWorld(0, 0, true)
-        }, World)
-    end
-    return instance
+function World.new()
+    return setmetatable({
+        wfWorld = WF.newWorld(0, 0, true)
+    }, World)
 end
 
 --- func desc

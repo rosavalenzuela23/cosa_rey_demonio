@@ -5,7 +5,7 @@ local Player = {}
 Player.__index = Player
 
 local instance = nil
-local worldInstance = World.getInstance()
+local worldInstance = World.new()
 
 local PlayerState = {
     STANDING = "standing",
@@ -21,11 +21,9 @@ Player.getInstance = function()
             width = 32,
             height = 64
         }
-        local bodyCollider = worldInstance:createRectangleCollider(0, 0, playerSize.width, playerSize.height)
-        bodyCollider:setFixedRotation(true)
 
         instance = setmetatable({
-            body = bodyCollider,
+            body = nil,
             size = playerSize,
             controls = {
                 up = globalState.state.config.keyboard.up,
@@ -73,8 +71,16 @@ Player.getInstance = function()
     return instance
 end
 
-function Player:updateAnimation(dt)
+function Player:setWorld(world)
 
+    local bodyCollider = world:createRectangleCollider(0, 0, self.size.width, self.size.height)
+    bodyCollider:setFixedRotation(true)
+    self.body = bodyCollider
+
+    return self
+end
+
+function Player:updateAnimation(dt)
     if self.animations[self.state].speed == nil then
         return
     end
@@ -88,7 +94,6 @@ function Player:updateAnimation(dt)
         if (self.animations[self.state].currentFrame > #self.animations[self.state].order) then
             self.animations[self.state].currentFrame = 1
         end
-
     end
 end
 
@@ -115,10 +120,13 @@ local normalizeVector2D = function(vector)
         x = vector.x / hypotenuse,
         y = vector.y / hypotenuse
     }
-    
 end
 
 function Player:move(dt)
+    if not self.body then
+        return
+    end
+
     local vector_x = 0
     local vector_y = 0
     local finalSpeed = self.movementSpeed
@@ -154,13 +162,15 @@ function Player:move(dt)
 end
 
 function Player:draw()
+    if not self.body then
+        return
+    end
+
     local x, y = self.body:getPosition()
     local image = self.animations[self.state].order[self.animations[self.state].currentFrame]
     local playerWidth = self.size.width
     local playerHeight = self.size.height
     love.graphics.draw(image, x, y, nil, nil, nil, playerWidth / 2, playerHeight / 2)
 end
-
-
 
 return Player
