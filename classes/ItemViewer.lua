@@ -77,7 +77,7 @@ function ItemViewer:draw()
     local pixelOffset = 10 -- px
     local innerPadding = 10 -- px
 
-    local r, g, b, a = love.graphics.getColor()
+    love.graphics.push()
 
     -- Dibujar un cuadrado como fondo para el texto
     love.graphics.setColor(self.backgroundColor)
@@ -94,7 +94,7 @@ function ItemViewer:draw()
     love.graphics.print(self.title, self.x + pixelOffset, text_y)
     love.graphics.print(self.description, self.x + pixelOffset, text_y + pixelOffset * 2)
 
-    love.graphics.setColor({ r, g, b, a })
+    love.graphics.pop()
 end
 
 return ItemViewer

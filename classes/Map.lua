@@ -1,10 +1,11 @@
-local Sti = require 'libraries.sti'
-local World = require 'classes.World'
+local Sti      = require 'libraries.sti'
+local World    = require 'classes.World'
 local EventBus = require 'classes.EventBus'
 local Player   = require 'classes.Player'
+local Camera   = require 'classes.Camera'
 
-local Map = {}
-Map.__index = Map
+local Map      = {}
+Map.__index    = Map
 
 --- func desc
 ---@param tilemapPath string
@@ -20,7 +21,8 @@ function Map.new(tilemapPath, npcList)
     local obj = setmetatable({
         npcList = npcList,
         _world = world,
-        _tileMap = map
+        _tileMap = map,
+        camera = Camera.new()
     }, Map)
 
     EventBus.getInstance():addEventListener(obj)
@@ -28,8 +30,18 @@ function Map.new(tilemapPath, npcList)
     return obj
 end
 
+function Map:unload()
+    EventBus.getInstance():removeEventListener(self)
+end
+
 function Map:update(dt)
     self._world:update(dt)
+    self.camera:lookAt(Player.getInstance().body:getX(), Player.getInstance().body:getY())
+
+    -- Use the improved method to keep the camera within the map boundaries.
+    local mapPixelWidth = self._tileMap.width * self._tileMap.tilewidth
+    local mapPixelHeight = self._tileMap.height * self._tileMap.tileheight
+    self.camera:clamp(mapPixelWidth, mapPixelHeight)
 end
 
 function Map:getWorld()
@@ -54,10 +66,17 @@ function Map:_notifyBusEvent(event, data)
 end
 
 function Map:draw()
-    self._tileMap.layers['ground']:draw()
-    self._tileMap.layers['trees']:draw()
-    Player.getInstance():draw()
-    self._tileMap.layers['sky']:draw()
+    self.camera:englobe(function()
+        self._tileMap.layers['ground']:draw()
+
+        for _, npc in pairs(self.npcList) do
+            npc:draw()
+        end
+
+        Player.getInstance():draw()
+        self._tileMap.layers['trees']:draw()
+        self._tileMap.layers['sky']:draw()
+    end)
 end
 
 --- func desc

@@ -46,6 +46,10 @@ end
 --- func desc
 ---@param mapName string
 function Game:loadMap(mapName)
+    if (self.currentMap ~= nil) then
+        self.currentMap:unload()
+    end
+    
     self.currentMap = self:getMap(mapName)
     Player.getInstance():setWorld(self.currentMap:getWorld())
 end

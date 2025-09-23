@@ -17,6 +17,10 @@ function EventBus:addEventListener(listener)
     table.insert(self.listeners, listener)
 end
 
+function EventBus:removeEventListener(listener)
+    table.remove(self.listeners, listener)
+end
+
 function EventBus:dispatchEvent(event, ...)
     assert(type(event) == "string", "event must be a string")
 

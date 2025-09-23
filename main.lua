@@ -1,19 +1,15 @@
--- libraries
-
 -- classes
-local NPC = require 'classes.NPC'
-local NPCDialog = require 'dialogs.TESTNpc'
 local DialogSystem = require 'classes.DialogSystem'
 local EventDispatcher = require 'classes.EventDispatcher'
 local Game = require 'classes.Game'
-local Map = require 'classes.Map'
 
 function love.load()
-    local npc = NPC.new(NPCDialog.npcName, NPCDialog.dialogs, {
-        position = { x = 0, y = 0 }
-    })
+    _G.GameDefault = {
+        width = 800,
+        height = 600,
+    }
 
-    Game.getInstance():addMap("test1", Map.new("maps/map2.lua", {npc}))
+    Game.getInstance():addMap("test1", require 'maps.map_objects.ForestMap')
     Game.getInstance():loadMap("test1")
 end
 
@@ -32,6 +28,10 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.keyreleased(key)
+    if key == "f11" then
+        love.window.setFullscreen(not love.window.getFullscreen())
+    end
+
     if key == "escape" then
         love.event.quit()
     end

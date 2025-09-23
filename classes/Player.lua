@@ -39,8 +39,8 @@ Player.getInstance = function()
                 walking = {
                     speed = 0.4, --ms
                     order = {
-                        love.graphics.newImage('sprites/player_sprites/walk_1.png'),
-                        love.graphics.newImage('sprites/player_sprites/walk_2.png')
+                        love.graphics.newImage('assets/sprites/player_sprites/walk_1.png'),
+                        love.graphics.newImage('assets/sprites/player_sprites/walk_2.png')
                     },
                     currentFrame = 1,
                     currentTime = 0
@@ -48,15 +48,15 @@ Player.getInstance = function()
                 running = {
                     speed = 0.2, --ms
                     order = {
-                        love.graphics.newImage('sprites/player_sprites/walk_1.png'),
-                        love.graphics.newImage('sprites/player_sprites/walk_2.png')
+                        love.graphics.newImage('assets/sprites/player_sprites/walk_1.png'),
+                        love.graphics.newImage('assets/sprites/player_sprites/walk_2.png')
                     },
                     currentFrame = 1,
                     currentTime = 0
                 },
                 standing = {
                     order = {
-                        love.graphics.newImage('sprites/player_sprites/standing.png')
+                        love.graphics.newImage('assets/sprites/player_sprites/standing.png')
                     },
                     currentFrame = 1,
                     currentTime = 0
