@@ -1,19 +1,20 @@
-local World = require("classes.World")
-local GlobalState = require("classes.GlobalState")
+local GlobalState     = require("classes.GlobalState")
+local EventBus        = require("classes.EventBus")
+local EventDispatcher = require("classes.EventDispatcher")
 
-local Player = {}
-Player.__index = Player
+local Player          = {}
+Player.__index        = Player
 
-local instance = nil
-local worldInstance = World.new()
+local instance        = nil
 
-local PlayerState = {
+local PlayerState     = {
     STANDING = "standing",
-    WALKING = "walking",
-    RUNNING = "running"
+    WALKING  = "walking",
+    RUNNING  = "running",
+    TALKING  = "talking"
 }
 
-Player.getInstance = function()
+Player.getInstance    = function()
     local globalState = GlobalState.getInstance()
 
     if not instance then
@@ -30,7 +31,8 @@ Player.getInstance = function()
                 down = globalState.state.config.keyboard.down,
                 left = globalState.state.config.keyboard.left,
                 right = globalState.state.config.keyboard.right,
-                run = globalState.state.config.keyboard.run
+                run = globalState.state.config.keyboard.run,
+                interact = globalState.state.config.keyboard.interact
             },
             sprites = {
                 actual_sprite = nil,
@@ -66,18 +68,33 @@ Player.getInstance = function()
             movementSpeed = 200, -- Pixels per second
             runningSpeed = 300
         }, Player)
+
+        EventBus.getInstance():addEventListener(instance)
+        EventDispatcher.getInstance():addEventListener("keypressed", instance)
     end
 
     return instance
 end
 
 function Player:setWorld(world)
-
     local bodyCollider = world:createRectangleCollider(0, 0, self.size.width, self.size.height)
     bodyCollider:setFixedRotation(true)
     self.body = bodyCollider
 
     return self
+end
+
+function Player:getPosition()
+    return self.body:getPosition()
+end
+
+function Player:isInRadius(radius, x, y)
+    local playerX, playerY = self:getPosition()
+
+    local isInX = x > playerX - radius and x < playerX + radius
+    local isInY = y > playerY - radius and y < playerY + radius
+
+    return isInX and isInY
 end
 
 function Player:updateAnimation(dt)
@@ -97,7 +114,37 @@ function Player:updateAnimation(dt)
     end
 end
 
+function Player:_keyboardPressed(key, scancode, isrepeat)
+    if self.state == PlayerState.TALKING then
+        return
+    end
+
+    if key == self.controls.interact then
+        EventBus.getInstance():dispatchEvent("PlayerAction")
+    end
+end
+
+function Player:notify(event, ...)
+    if event == 'keypressed' then
+        self:_keyboardPressed(...)
+        return
+    end
+
+    if event == "bus-DialogStarted" then
+        self.state = PlayerState.TALKING
+        return
+    end
+
+    if event == "bus-DialogEnded" then
+        self.state = PlayerState.STANDING
+        return
+    end
+end
+
 function Player:update(dt)
+    if not self.body or self.state == PlayerState.TALKING then
+        return
+    end
     self:move(dt)
     self:updateAnimation(dt)
 end
@@ -163,6 +210,10 @@ end
 
 function Player:draw()
     if not self.body then
+        return
+    end
+
+    if self.state == PlayerState.TALKING then
         return
     end
 

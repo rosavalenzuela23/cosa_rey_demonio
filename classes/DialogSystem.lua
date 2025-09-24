@@ -1,5 +1,6 @@
 local TALKIES = require 'libraries.talkies.talkies'
 local EventDispatcher = require("classes.EventDispatcher")
+local EventBus        = require("classes.EventBus")
 
 local DialogSystem = {}
 DialogSystem.__index = DialogSystem
@@ -63,17 +64,19 @@ function DialogSystem:_onComplete(dialog, onComplete)
     end
 
     self.active = false
+    if not TALKIES.isOpen() then
+        EventBus.getInstance():dispatchEvent("DialogEnded")
+    end
 end
 
 function DialogSystem:showMessage(title, message, config, options)
     config = config or {}
-    options = options or {}
 
     self.active = true
     TALKIES.say(title, message, {
         onstart = self._onStart,
         oncomplete = function(dialog)
-            self:_onComplete(dialog, config.onComplete)
+            self:_onComplete(dialog, config.oncomplete)
         end,
         options = options
     })

@@ -12,7 +12,8 @@ return {
             down = "s",
             left = "a",
             right = "d",
-            run = "lshift"
+            run = "lshift",
+            interact = "space"
         }
     }
 }

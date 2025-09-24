@@ -24,6 +24,7 @@ end
 function EventBus:dispatchEvent(event, ...)
     assert(type(event) == "string", "event must be a string")
 
+    print("Event dispatched: " .. event)
     for _, listener in ipairs(self.listeners) do
         listener:notify("bus-" .. event, ...)
     end
