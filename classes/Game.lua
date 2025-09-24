@@ -35,6 +35,7 @@ end
 ---@param event string
 function Game:notify(event, ...)
     if (string.find(event, "bus-")) then
+        print(event, ...)
         self:_notifyEventBus(event, ...)
     end
 end

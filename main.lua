@@ -1,5 +1,6 @@
 -- classes
 local DialogSystem = require 'classes.DialogSystem'
+local EventBus        = require 'classes.EventBus'
 local EventDispatcher = require 'classes.EventDispatcher'
 local Game = require 'classes.Game'
 
@@ -15,6 +16,7 @@ end
 
 function love.update(dt)
     Game.getInstance():update(dt)
+    EventBus.getInstance():update(dt)
     DialogSystem.getInstance():update(dt)
 end
 

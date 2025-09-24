@@ -42,6 +42,7 @@ function NPC:_notifyBusEvent(event, ...)
 end
 
 function NPC:notify(event, ...)
+    print("event: " .. event)
     if event:find("bus-") then
         self:_notifyBusEvent(event, ...)
     end

@@ -6,7 +6,8 @@ local instance = nil
 function EventBus.getInstance()
     if (not instance) then
         instance = setmetatable({
-            listeners = {}
+            listeners = {},
+            queue = {}
         }, EventBus)
     end
 
@@ -21,13 +22,20 @@ function EventBus:removeEventListener(listener)
     table.remove(self.listeners, listener)
 end
 
+function EventBus:update(dt)    
+    for _, event in ipairs(self.queue) do
+        for _, listener in ipairs(self.listeners) do
+            listener:notify(event.event, unpack(event.args)) 
+        end
+    end
+
+    -- clear queue
+    self.queue = {}
+end
+
 function EventBus:dispatchEvent(event, ...)
     assert(type(event) == "string", "event must be a string")
-
-    print("Event dispatched: " .. event)
-    for _, listener in ipairs(self.listeners) do
-        listener:notify("bus-" .. event, ...)
-    end
+    table.insert(self.queue, { event = "bus-"..event, args = { ... } })
 end
 
 return EventBus
