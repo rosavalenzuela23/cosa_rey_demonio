@@ -97,19 +97,29 @@ function Player:isInRadius(radius, x, y)
     return isInX and isInY
 end
 
+function Player:_getCurrentAnimation()
+    
+    if self.state == PlayerState.TALKING then
+        return self.animations.standing
+    end
+
+    return self.animations[self.state]
+end
+
 function Player:updateAnimation(dt)
-    if self.animations[self.state].speed == nil then
+    local animation = self:_getCurrentAnimation()
+    if animation.speed == nil then
         return
     end
 
-    self.animations[self.state].currentTime = self.animations[self.state].currentTime + dt
+    animation.currentTime = animation.currentTime + dt
 
-    if (self.animations[self.state].currentTime >= self.animations[self.state].speed) then
-        self.animations[self.state].currentTime = 0
-        self.animations[self.state].currentFrame = self.animations[self.state].currentFrame + 1
+    if (animation.currentTime >= animation.speed) then
+        animation.currentTime = 0
+        animation.currentFrame = animation.currentFrame + 1
 
-        if (self.animations[self.state].currentFrame > #self.animations[self.state].order) then
-            self.animations[self.state].currentFrame = 1
+        if (animation.currentFrame > #animation.order) then
+            animation.currentFrame = 1
         end
     end
 end
@@ -213,12 +223,10 @@ function Player:draw()
         return
     end
 
-    if self.state == PlayerState.TALKING then
-        return
-    end
+    local animation = self:_getCurrentAnimation()
 
     local x, y = self.body:getPosition()
-    local image = self.animations[self.state].order[self.animations[self.state].currentFrame]
+    local image = animation.order[animation.currentFrame]
     local playerWidth = self.size.width
     local playerHeight = self.size.height
     love.graphics.draw(image, x, y, nil, nil, nil, playerWidth / 2, playerHeight / 2)
