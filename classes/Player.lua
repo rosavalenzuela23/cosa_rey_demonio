@@ -129,7 +129,7 @@ function Player:_keyboardPressed(key, scancode, isrepeat)
         return
     end
 
-    if key == self.controls.interact then
+    if key == self.controls.interact.primary or key == self.controls.interact.secondary then
         EventBus.getInstance():dispatchEvent("PlayerAction")
     end
 end
@@ -189,20 +189,26 @@ function Player:move(dt)
     local finalSpeed = self.movementSpeed
     self.state = PlayerState.STANDING
 
-    if love.keyboard.isDown(self.controls.right) then
+    local right = love.keyboard.isDown(self.controls.right.primary) or love.keyboard.isDown(self.controls.right.secondary)
+    local left = love.keyboard.isDown(self.controls.left.primary) or love.keyboard.isDown(self.controls.left.secondary)
+    local down = love.keyboard.isDown(self.controls.down.primary) or love.keyboard.isDown(self.controls.down.secondary)
+    local up = love.keyboard.isDown(self.controls.up.primary) or love.keyboard.isDown(self.controls.up.secondary)
+    local running = love.keyboard.isDown(self.controls.run.primary) or love.keyboard.isDown(self.controls.run.secondary)
+
+    if right then
         vector_x = vector_x + 1
     end
-    if love.keyboard.isDown(self.controls.left) then
+    if left then
         vector_x = vector_x - 1
     end
-    if love.keyboard.isDown(self.controls.down) then
+    if down then
         vector_y = vector_y + 1
     end
-    if love.keyboard.isDown(self.controls.up) then
+    if up then
         vector_y = vector_y - 1
     end
 
-    if love.keyboard.isDown(self.controls.run) then
+    if running then
         finalSpeed = self.runningSpeed
     end
 

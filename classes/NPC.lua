@@ -73,10 +73,16 @@ function NPC:draw()
     end
 
     if Player.getInstance():isInRadius(self.dialogRadiusThreshold, self.position.x, self.position.y) then
-        love.graphics.draw(self._dialogSprite, self.position.x, self.position.y - 40)
+        
+        love.graphics.draw(self._dialogSprite, self.position.x, self.position.y - self.sprite:getHeight())
+
+        if _G.GameDefault.DEBUG then
+            local playerX, playerY = Player.getInstance():getPosition()
+            love.graphics.line(self.position.x, self.position.y, playerX, playerY)
+        end
     end
 
-    love.graphics.draw(self.sprite, self.position.x, self.position.y)
+    love.graphics.draw(self.sprite, self.position.x, self.position.y, nil, nil, nil, self.sprite:getWidth() / 2, self.sprite:getHeight() / 2)
 end
 
 return NPC

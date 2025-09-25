@@ -8,12 +8,30 @@ return {
     config = {
         language = "es",
         keyboard = {
-            up = "w",
-            down = "s",
-            left = "a",
-            right = "d",
-            run = "lshift",
-            interact = "space"
+            up = {
+                primary = "w",
+                secondary = "up"
+            },
+            down = {
+                primary = "s",
+                secondary = "down"
+            },
+            left = {
+                primary = "a",
+                secondary = "left"
+            },
+            right = {
+                primary = "d",
+                secondary = "right"
+            },
+            run = {
+                primary = "lshift",
+                secondary = "rshift"
+            },
+            interact = {
+                primary = "space",
+                secondary = "return"
+            }
         }
     }
 }

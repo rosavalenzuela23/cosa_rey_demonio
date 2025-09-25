@@ -5,9 +5,11 @@ local EventDispatcher = require 'classes.EventDispatcher'
 local Game = require 'classes.Game'
 
 function love.load()
+    
     _G.GameDefault = {
         width = 800,
         height = 600,
+        DEBUG = true
     }
 
     Game.getInstance():addMap("test1", require 'maps.map_objects.ForestMap')

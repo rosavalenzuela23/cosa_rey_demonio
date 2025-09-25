@@ -1,6 +1,7 @@
 local TALKIES = require 'libraries.talkies.talkies'
 local EventDispatcher = require("classes.EventDispatcher")
 local EventBus        = require("classes.EventBus")
+local State = require("classes.State")
 
 local DialogSystem = {}
 DialogSystem.__index = DialogSystem
@@ -29,15 +30,17 @@ function DialogSystem:keypressed(key, scancode, isrepeat)
         return
     end
 
-    if key == "w" then
+    local keyboard = State.config.keyboard
+
+    if key == keyboard.up.primary or key == keyboard.up.secondary then
         TALKIES.prevOption()
     end
 
-    if key == "s" then
+    if key == keyboard.down.primary or key == keyboard.down.secondary then
         TALKIES.nextOption()
     end
 
-    if key == "space" then
+    if key == keyboard.interact.primary or key == keyboard.interact.secondary then
         TALKIES.onAction()
     end
 end
