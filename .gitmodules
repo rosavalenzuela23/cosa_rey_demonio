@@ -7,4 +7,9 @@
 [submodule "Menori"]
     path = libraries/Menori
     url = https://github.com/rozenmad/Menori.git
+
+[submodule "windfield"]
+    path = libraries/windfield
+    url = https://github.com/a327ex/windfield.git
+    
     
